@@ -71,6 +71,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Contour.cs" />
     <Compile Include="Handler.cs" />
     <Page Include="WpfGui.xaml">
       <Generator>MSBuild:Compile</Generator>

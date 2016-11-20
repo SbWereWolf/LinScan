@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LinScan"
         mc:Ignorable="d"
         Title="MainWindow" Height="595" Width="795" Background="{x:Null}" Loaded="GuiMainWindow_Loaded">
     <Grid x:Name="MainGrid" Margin="0,0,-2,0" >
@@ -35,19 +34,20 @@
         <GridSplitter x:Name="MaintGridHorizontalSplitter" Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Height="5"/>
         <GridSplitter x:Name="MaintGridVerticalSplitter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Row="2" Width="5"/>
         <ScrollViewer Grid.Column="0" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" >
-            <Canvas x:Name="SomeCanvas" MouseMove="SomeCanvas_MouseMove" MouseDown="SomeCanvas_MouseDown" Margin="0,0,163.8,0" Width="240" Height="131072"/>
+            <Canvas x:Name="DataCanvas" MouseMove="SomeCanvas_MouseMove" MouseDown="SomeCanvas_MouseDown" Margin="0,0,163.8,0" Width="240" Height="131072" MouseUp="DataCanvas_MouseUp"/>
         </ScrollViewer>
         <ToolBarTray x:Name="MainToolBarTray" Grid.Row="0"
                      Grid.ColumnSpan="3" Grid.Column="0" MinWidth="350" MinHeight="30" ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <ToolBar x:Name="DataFileToolBar" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left" MinWidth="150" MinHeight="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                <Button x:Name="SelectDataFileButton" Content="Выбрать файл" VerticalAlignment="Top" HorizontalAlignment="Left" ToolTip="Выбрать файл с данными" Background="#FF79BDE7" Click="SelectDataFileButton_Click"/>
+                <Button x:Name="SelectDataFileButton" Content="Выбрать файл" VerticalAlignment="Top" HorizontalAlignment="Left" ToolTip="Выбрать файл с данными" Background="#FF97D7FF" Click="SelectDataFileButton_Click"/>
                 <Label x:Name="DataFileLabel" Content="Файл данных : " VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <Label x:Name="DataFilePathLabel" Content=" файл не выбран"/>
-                <Button x:Name="LoadDataFileButton" Content="Загрузить файл" VerticalAlignment="Top" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Background="#FF68DCB9" Click="LoadDataFileButton_Click"/>
+                <Label x:Name="DataFilePathLabel" Content=" файл не выбран" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Button x:Name="LoadDataFileButton" Content="Загрузить файл" VerticalAlignment="Top" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Background="#FF76E7C5" Click="LoadDataFileButton_Click"/>
             </ToolBar>
             <ToolBar x:Name="ContourToolBar" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" MinWidth="200">
                 <Label x:Name="ContourModeLabel" Content="Режим добавления рамок :" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <Button x:Name="ContourModeToggleButton" Background="#FFB7C53E" Content="ВЫКЛ" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Button x:Name="ContourModeToggleButton" Background="#FFD2DF67" Content="ВЫКЛ" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ContourModeToggleButton_Click"/>
+                <Button x:Name="ClearContoursButton" Background="#FFD290DD" Content="Очистить" VerticalAlignment="Top" HorizontalAlignment="Left" Click="ClearContoursButton_Click"/>
             </ToolBar>
         </ToolBarTray>
 
