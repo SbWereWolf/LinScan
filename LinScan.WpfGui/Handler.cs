@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Win32;
+using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
+using PixelFormat = System.Windows.Media.PixelFormat;
+using Point = System.Windows.Point;
+using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace LinScan
 {
@@ -83,45 +92,86 @@ namespace LinScan
 
         public static void LoadData(Label pathLabel, Canvas thisCanvas)
         {
-            var isDataLoad = false;
-            byte[] byteArray = null;
+            string path = null;
             if (pathLabel?.Content != null && thisCanvas != null)
             {
-                var path = pathLabel.Content.ToString();
-                try
-                {
-                    byteArray = File.ReadAllBytes(path);
-                    isDataLoad = true;
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show($@"failed with open file '{path}' ");
-                }
+                path = pathLabel.Content.ToString();
+
             }
 
-            if (isDataLoad)
+            if ( !string.IsNullOrWhiteSpace(path)) 
             {
-                ImageBrush brush = new ImageBrush();
+                const int fileLineSize = 240;
+                const int linesToRead = 131072;
+                const int hexMask = 0x03FF;
 
-                using (var stream = new MemoryStream(byteArray))
+                var chunk = new byte[fileLineSize];
+                var unpackData = new List<int>();
+
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    try
+                    var bytesNumber = fileLineSize;
+                    var counter = 0;
+                    int buffer =0;
+                    var bufferSize = 0;
+                    const int bufferLimit = 10;
+                    const int byteSize = 8;
+
+
+                    
+
+                    while ( bytesNumber > 0 && counter < linesToRead)
                     {
-                        brush.ImageSource = BitmapFrame.Create
-                            (stream,
-                                BitmapCreateOptions.IgnoreImageCache,
-                                BitmapCacheOption.OnLoad
-                            );
-                    }
-                    catch (Exception)
-                    {
-                        MessageBox.Show(@" failed with load file, possible is not correct file format ");
+                        counter++;
+                        bytesNumber = fs.Read(chunk, 0, fileLineSize);
+
+                        foreach (byte nextByte in chunk)
+                        {
+                            var nextPie = nextByte << bufferSize;
+                            buffer += nextPie;
+                            bufferSize += byteSize;
+
+                            if ( bufferSize >= bufferLimit )
+                            {
+                                var portion = buffer & hexMask;
+                                unpackData.Add(portion);
+                                buffer >>= bufferLimit;
+                                bufferSize -= bufferLimit;
+                            }
+                        }
                     }
                 }
+
+                const int imageLineSize = 192;
+                int[] pixelValues = unpackData.ToArray();
+
+                Bitmap bmp = new Bitmap(imageLineSize, linesToRead);
+
+                for (int lineNumber = 0; lineNumber < linesToRead; lineNumber++)
+                {
+                    for (int linePosition = 0; linePosition < imageLineSize; linePosition++)
+                    {
+                        long index = linePosition + imageLineSize * lineNumber;
+                        var color = (int)Math.Truncate((double)pixelValues[index] * 255 / hexMask);
+                        bmp.SetPixel(linePosition, lineNumber, System.Drawing.Color.FromArgb(color, color, color));
+                    }
+                }
+
+                var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bmp.GetHbitmap(),
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions()
+                    );
+                bmp.Dispose();
+                var brush = new ImageBrush(bitmapSource);
 
                 thisCanvas.Background = brush;
+
+
             }
         }
+
+
 
         public static void ClearCanvas(Canvas thisCanvas, DataGrid contourDataGrid, List<Contour> contourList)
         {
@@ -253,34 +303,5 @@ namespace LinScan
                 }
             }
         }
-
-
-        public static IEnumerable<byte[]> ReadChunks(string path)
-        {
-            var lengthBytes = new byte[sizeof(int)];
-
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                int n = fs.Read(lengthBytes, 0, sizeof(int));  // Read block size.
-
-                if (n == 0)      // End of file.
-                    yield break;
-
-                if (n != sizeof(int))
-                    throw new InvalidOperationException("Invalid header");
-
-                int blockLength = BitConverter.ToInt32(lengthBytes, 0);
-                var buffer = new byte[blockLength];
-                n = fs.Read(buffer, 0, blockLength);
-
-                if (n != blockLength)
-                    throw new InvalidOperationException("Missing data");
-
-                yield return buffer;
-            }
-        }
-
-
-
     }
 }
