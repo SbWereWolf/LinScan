@@ -13,15 +13,23 @@ namespace LinScan
         public double Length { get; set; }
         public double Width { get; set; }
 
+        private int DrawCrossLimit { get; } 
+
+        public Contour( int drawCrossLimit)
+        {
+            DrawCrossLimit = drawCrossLimit;
+        }
+
         private Contour Copy()
         {
-            var copy = new Contour
+            var copy = new Contour(this.DrawCrossLimit)
             {
                 Y = this.Y,
                 Width = this.Width,
                 Length = this.Length,
                 X = this.X
             };
+
             return copy;
         }
 
@@ -29,10 +37,6 @@ namespace LinScan
         {
             var contourCopy = this.Copy();
             contourList?.Add(contourCopy);
-            //if (contourCopy != null)
-            //{
-            //    Console.WriteLine($@"x={contourCopy.X} y={contourCopy.Y} l={contourCopy.Length} w={contourCopy.Width}");
-            //}
 
             if (contourDataGrid != null && contourList != null)
             {
@@ -42,9 +46,8 @@ namespace LinScan
 
         public bool IsDrawCross()
         {
-            // ReSharper disable CompareOfFloatsByEqualityOperator
-            var letDrawCross = this.Length == 1 || this.Width == 1;
-            // ReSharper restore CompareOfFloatsByEqualityOperator
+            var letDrawCross = this.Length < DrawCrossLimit || this.Width < DrawCrossLimit;
+            
             return letDrawCross;
         }
 

@@ -6,11 +6,12 @@ namespace LinScan
 {
     public partial class WpfGui
     {
-        private Handler.RectangleAndPoint RectangleAndPoint { get; set; } = new Handler.RectangleAndPoint();
+        private GuiHandler.RectangleAndPoint RectangleAndPoint { get; set; } = new GuiHandler.RectangleAndPoint();
         private bool ContourMode { get; set; }
+        private string DatafilePath { get; set; } = " файл не выбран";
 
         private List<Contour> ContourList { get; } = new List<Contour>();
-        private Contour Contour { get; set; } = new Contour();
+        private Contour Contour { get; set; } = new Contour(GuiHandler.DrawCrossLimit);
 
         public WpfGui()
         {
@@ -22,64 +23,63 @@ namespace LinScan
             var pathLabel = DataFilePathLabel;
             var thisCanvas = DataCanvas;
 
-            var isSuccess = Handler.SetDataFileName(pathLabel);
-            if ( isSuccess)
-            {
-                Handler.LoadData(pathLabel, thisCanvas);
-            }
+            DatafilePath = GuiHandler.LoadDataFile(pathLabel, thisCanvas);
         }
+
+
 
         private void GuiMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var mainGrid = MainGrid;
-            Handler.SetMainGridView(mainGrid);
+            GuiHandler.SetMainGridView(mainGrid);
 
             var contourModeToggleButton = ContourModeToggleButton;
-            Handler.SetContourModeView(contourModeToggleButton,ContourMode);
-
-            var contourList = ContourList;
+            GuiHandler.SetContourModeView(contourModeToggleButton,ContourMode);
+            
             var dataCanvas = DataCanvas;
-            var contourDataGrid = ContourDataGrid;
-            Handler.ClearCanvas(dataCanvas, contourDataGrid, contourList);
-            if (ContourDataGrid != null)
-            {
-                ContourDataGrid.ItemsSource = ContourList;
-            }
+            GuiHandler.SetCanvasView(dataCanvas);
+
+            var dataFilePathLabel = this.DataFilePathLabel;
+            GuiHandler.SetDataFilePathLabelView(dataFilePathLabel, DatafilePath);
         }
 
         private void LoadDataFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var pathLabel = DataFilePathLabel;
-            var canvas = DataCanvas;            
-            Handler.LoadData(pathLabel, canvas);
+            var canvas = DataCanvas;
+            var path = DatafilePath;
+            GuiHandler.LoadData(canvas, path);
 
             var contourList = ContourList;
             var contourDataGrid = ContourDataGrid;
-            Handler.ClearCanvas(canvas, contourDataGrid, contourList);
+            GuiHandler.RemoveSelections(canvas, contourDataGrid, contourList);
         }
 
-        private void SomeCanvas_MouseMove(object sender, MouseEventArgs e)
+
+
+        private void DataCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             var canvas = DataCanvas;
             var cursorLocationDataGrid = CursorLocationDataGrid;
+            var rectangleAndPoint = RectangleAndPoint;
 
-            if (ContourMode && e != null )
+            if (e != null && ContourMode)
             {
-                var point = Mouse.GetPosition(canvas);
-                var contour = Handler.DrawRectangle(e, point, RectangleAndPoint);
-                Handler.ShowCanvasContour( cursorLocationDataGrid, contour);
+                var contour = GuiHandler.DrawRectangle(e, canvas, rectangleAndPoint, cursorLocationDataGrid);
 
-                Contour = contour;
+                if (contour != null)
+                {
+                    Contour = contour;
+                }
             }
         }
 
-        private void SomeCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        private void DataCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var canvas = DataCanvas;
 
             if (ContourMode)
             {
-                RectangleAndPoint = Handler.SetRectangle(canvas);
+                RectangleAndPoint = GuiHandler.SetRectangle(canvas);
             }
         }
 
@@ -87,7 +87,7 @@ namespace LinScan
         {
             var contourModeToggleButton = ContourModeToggleButton;
             ContourMode = !ContourMode;
-            Handler.SetContourModeView(contourModeToggleButton, ContourMode);
+            GuiHandler.SetContourModeView(contourModeToggleButton, ContourMode);
         }
 
         private void ClearContoursButton_Click(object sender, RoutedEventArgs e)
@@ -96,7 +96,7 @@ namespace LinScan
             var canvas = DataCanvas;
             var contourDataGrid = ContourDataGrid;
             
-            Handler.ClearCanvas(canvas, contourDataGrid, contourList);
+            GuiHandler.RemoveSelections(canvas, contourDataGrid, contourList);
         }
 
         private void DataCanvas_MouseUp(object sender, MouseButtonEventArgs e)
@@ -107,14 +107,11 @@ namespace LinScan
             var contourDataGrid = ContourDataGrid;
             var rectangle = RectangleAndPoint?.Rect;
 
-            Handler.AddContourToView
-                (
-                    contour,
-                    contourList,
-                    contourDataGrid,
-                    rectangle,
-                    canvas
-                );
+            if (ContourMode)
+            {
+                GuiHandler.AddContourToView(contour, contourList, contourDataGrid, rectangle, canvas);               
+            }
+
         }
     }
 }
