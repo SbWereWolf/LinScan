@@ -52,7 +52,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -72,7 +71,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Contour.cs" />
-    <Compile Include="Handler.cs" />
+    <Compile Include="GuiHandler.cs" />
     <Page Include="WpfGui.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -81,6 +80,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UxHandler.cs" />
     <Compile Include="WpfGui.xaml.cs">
       <DependentUpon>WpfGui.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -127,6 +127,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LinScan.DataProcessing\LinScan.DataProcessing.csproj">
+      <Project>{dfded146-6113-4d74-9ab3-d4c4b0963416}</Project>
+      <Name>LinScan.DataProcessing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

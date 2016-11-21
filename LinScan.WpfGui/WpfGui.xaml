@@ -17,24 +17,17 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <ToolBarTray  HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <StackPanel Grid.Column="2" Grid.Row="2">
+        <StackPanel x:Name="InformationStackPanel" Grid.Column="2" Grid.Row="2">
             <TextBlock x:Name="CursorLocationTextBlock" TextWrapping="Wrap" Text="Положение курсора" Margin="0" Background="White"/>
             <DataGrid x:Name="CursorLocationDataGrid" MinWidth="100" MinHeight="50" Grid.IsSharedSizeScope="True"/>
             <TextBlock x:Name="ContourTextBlock" TextWrapping="Wrap" Text="Рамки" Margin="0" Background="White"/>
-            <DataGrid x:Name="ContourDataGrid" Grid.IsSharedSizeScope="True" MinWidth="150" MinHeight="50">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="X" MinWidth="40"/>
-                    <DataGridTextColumn Header="Y" MinWidth="40"/>
-                    <DataGridTextColumn Header="Length" MinWidth="70"/>
-                    <DataGridTextColumn Header="Width" MinWidth="70"/>
-                </DataGrid.Columns>
-            </DataGrid>
-            
+            <DataGrid x:Name="ContourDataGrid" Grid.IsSharedSizeScope="True" MinWidth="150" MinHeight="50" Height="194" Margin="0,0,-0.2,0" VerticalAlignment="Top"/>
+
         </StackPanel>
         <GridSplitter x:Name="MaintGridHorizontalSplitter" Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Height="5"/>
         <GridSplitter x:Name="MaintGridVerticalSplitter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Row="2" Width="5"/>
         <ScrollViewer Grid.Column="0" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" >
-            <Canvas x:Name="DataCanvas" MouseMove="SomeCanvas_MouseMove" MouseDown="SomeCanvas_MouseDown" Margin="0,0,163.8,0" Width="240" Height="131072" MouseUp="DataCanvas_MouseUp"/>
+            <Canvas x:Name="DataCanvas" MouseMove="DataCanvas_MouseMove" MouseDown="DataCanvas_MouseDown" Margin="0,0,163.8,0" Width="240" Height="131072" MouseUp="DataCanvas_MouseUp"/>
         </ScrollViewer>
         <ToolBarTray x:Name="MainToolBarTray" Grid.Row="0"
                      Grid.ColumnSpan="3" Grid.Column="0" MinWidth="350" MinHeight="30" ScrollViewer.VerticalScrollBarVisibility="Disabled">
